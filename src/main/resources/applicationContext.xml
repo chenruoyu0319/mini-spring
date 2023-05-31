@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans>
+    <bean id="aservice" class="com.cry.mini.springframework.examples.ioc.AServiceImpl">
+        <constructor-arg type="String" name="name" value="abc"/>
+        <constructor-arg type="int" name="level" value="3"/>
+        <constructor-arg type="com.cry.mini.springframework.examples.ioc.BaseConService" name="refCon"
+                         ref="baseconservice"/>
+        <property type="String" name="property1" value="Someone says"/>
+        <property type="String" name="property2" value="Hello World!"/>
+        <property type="com.cry.mini.springframework.examples.ioc.BaseService" name="ref1" ref="baseservice"/>
+    </bean>
+    <bean id="basebaseservice" class="com.cry.mini.springframework.examples.ioc.BaseBaseService">
+        <property type="com.cry.mini.springframework.examples.ioc.AServiceImpl" name="as" ref="aservice"/>
+    </bean>
+    <bean id="baseservice" class="com.cry.mini.springframework.examples.ioc.BaseService">
+        <!--        <property type="com.cry.mini.springframework.examples.ioc.BaseBaseService" name="bbs" ref="basebaseservice"/>-->
+        <property type="String" name="name" value="小红"/>
+    </bean>
+    <bean id="baseconservice" class="com.cry.mini.springframework.examples.ioc.BaseConService">
+        <property type="String" name="name" value="小绿"/>
+    </bean>
+    <bean id="bbs" class="com.cry.mini.springframework.examples.ioc.BaseBaseService">
+        <property type="com.cry.mini.springframework.examples.ioc.AServiceImpl" name="as" ref="aservice"/>
+    </bean>
+    <bean id="handlerAdapter" class="com.cry.mini.springframework.web.method.annotation.RequestMappingHandlerAdapter">
+        <property type="com.cry.mini.springframework.http.converter.HttpMessageConverter" name="messageConverter"
+                  ref="messageConverter"/>
+        <property type="com.cry.mini.springframework.web.bind.support.WebBindingInitializer"
+                  name="webBindingInitializer" ref="webBindingInitializer"/>
+    </bean>
+    <bean id="webBindingInitializer" class="com.cry.mini.springframework.examples.mvc.DateInitializer"></bean>
+    <bean id="messageConverter" class="com.cry.mini.springframework.http.converter.DefaultHttpMessageConverter">
+        <property type="com.cry.mini.springframework.util.ObjectMapper" name="objectMapper" ref="objectMapper"/>
+    </bean>
+    <bean id="objectMapper" class="com.cry.mini.springframework.util.DefaultObjectMapper">
+        <property type="String" name="dateFormat" value="yyyy/MM/dd"/>
+        <property type="String" name="decimalFormat" value="###.##"/>
+    </bean>
+    <bean id="viewResolver" class="com.cry.mini.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property type="String" name="viewClassName" value="com.cry.mini.springframework.web.servlet.view.JstlView"/>
+        <property type="String" name="prefix" value="/jsp/"/>
+        <property type="String" name="suffix" value=".jsp"/>
+        <!--        <property type="String" name="suffix" value=".pdf"/>-->
+    </bean>
+    <bean id="jdbcTemplate" class="com.cry.mini.springframework.jdbc.core.JdbcTemplate">
+        <property type="javax.sql.DataSource" name="dataSource" ref="dataSource"/>
+    </bean>
+    <!--    <bean id="dataSource" class="com.cry.mini.springframework.jdbc.datasource.SingleConnectionDataSource">-->
+    <bean id="dataSource" class="com.cry.mini.springframework.jdbc.pool.PooledDataSource">
+        <property type="String" name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property type="String" name="url"
+                  value="jdbc:mysql://localhost:3306/ibatis?useUnicode=true&amp;characterEncoding=utf8&amp;allowMultiQueries=true"/>
+        <property type="String" name="username" value="root"/>
+        <property type="String" name="password" value="cry777!!"/>
+        <property type="int" name="initialSize" value="7"/>
+    </bean>
+    <bean id="userService" class="com.cry.mini.springframework.examples.jdbc.UserService">
+        <property type="com.cry.mini.springframework.jdbc.core.JdbcTemplate" name="jdbcTemplate" ref="jdbcTemplate"/>
+    </bean>
+    <bean id="sqlSessionFactory" class="com.cry.mini.springframework.ibatis.DefaultSqlSessionFactory"
+          init-method="init">
+        <constructor-arg type="String" name="mapperLocations" value="mapper"/>
+        <!--        <property type="String" name="mapperLocations" value="mapper"/>-->
+    </bean>
+    <bean id="userService2" class="com.cry.mini.springframework.examples.ibatis.UserService2"/>
+    <bean id="realaction" class="com.cry.mini.springframework.aop.dynamic.Action1"/>
+    <bean id="myInterceptor" class="com.cry.mini.springframework.examples.aop.TracingInterceptor"/>
+    <!--    <bean id="action" class="com.cry.mini.springframework.aop.ProxyFactoryBean">-->
+    <!--        <property type="java.lang.Object" name="target" ref="realaction"/>-->
+    <!--&lt;!&ndash;        <property type="String" name="interceptorName" value="myInterceptor"/>&ndash;&gt;-->
+    <!--&lt;!&ndash;        <property type="String" name="interceptorName" value="myBeforeAdvice"/>&ndash;&gt;-->
+    <!--        <property type="String" name="interceptorName" value="advisor"/>-->
+    <!--    </bean>-->
+    <bean id="autoProxyCreator" class="com.cry.mini.springframework.aop.autoproxy.BeanNameAutoProxyCreator">
+        <property type="String" name="pattern" value="action*"/>
+        <property type="String" name="interceptorName" value="advisor"/>
+    </bean>
+    <bean id="myBeforeAdvice" class="com.cry.mini.springframework.examples.aop.MyBeforeAdvice"/>
+    <bean id="advisor" class="com.cry.mini.springframework.aop.support.NameMatchMethodPointcutAdvisor">
+        <property type="com.cry.mini.springframework.aop.Advice" name="advice" ref="myBeforeAdvice"/>
+        <property type="String" name="mappedName" value="do*"/>
+    </bean>
+    <bean id="action" class="com.cry.mini.springframework.aop.dynamic.Action1"/>
+    <bean id="action2" class="com.cry.mini.springframework.aop.dynamic.Action2"/>
+    <bean id="autowiredAnnotationBeanPostProcessor" class="com.cry.mini.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+    <bean id="transactionInterceptor" class="com.cry.mini.springframework.transaction.TransactionInterceptor" >
+        <property type="com.cry.mini.springframework.transaction.TransactionManager" name="transactionManager" ref="txManager" />
+    </bean>
+    <bean id="txManager" class="com.cry.mini.springframework.transaction.TransactionManager">
+    </bean>
+</beans>
